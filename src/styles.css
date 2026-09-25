@@ -1,0 +1,181 @@
+:root {
+  color-scheme: light;
+  --bubble-bg: #ffffc8;
+  --bubble-border: #000;
+  --ink: #111;
+  --accent: #0a5cff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: "Comic Sans MS", "Chalkboard SE", "Comic Neue", cursive, system-ui, sans-serif;
+  user-select: none;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+#stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px;
+  gap: 8px;
+}
+
+#clippy-canvas {
+  width: 186px;
+  height: 140px;
+  image-rendering: pixelated;
+  cursor: grab;
+  filter: drop-shadow(2px 3px 2px rgba(0, 0, 0, 0.25));
+  /* macOS WebKit: allow dragging frameless window from the character */
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+#clippy-canvas:active {
+  cursor: grabbing;
+}
+
+.bubble,
+.bubble * {
+  -webkit-app-region: no-drag;
+  app-region: no-drag;
+}
+
+.bubble {
+  position: relative;
+  width: min(320px, 100%);
+  background: var(--bubble-bg);
+  border: 2px solid var(--bubble-border);
+  border-radius: 12px;
+  padding: 14px 28px 12px 14px;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.15);
+  animation: pop-in 180ms ease-out;
+}
+
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: 48px;
+  bottom: -10px;
+  width: 16px;
+  height: 16px;
+  background: var(--bubble-bg);
+  border-right: 2px solid var(--bubble-border);
+  border-bottom: 2px solid var(--bubble-border);
+  transform: rotate(45deg);
+}
+
+.bubble.hidden {
+  display: none;
+}
+
+.bubble-text {
+  min-height: 2.4em;
+  max-height: 140px;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.35;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 10px;
+  cursor: text;
+  user-select: text;
+}
+
+.chat-form {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+#chat-input {
+  flex: 1;
+  border: 1px solid #888;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 13px;
+  background: #fffef0;
+  outline: none;
+}
+
+#chat-input:focus {
+  border-color: var(--accent);
+}
+
+#send-btn {
+  border: 1px solid #333;
+  background: #e8e8ff;
+  border-radius: 4px;
+  width: 32px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#send-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+#bubble-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: #444;
+}
+
+.status {
+  font-size: 11px;
+  color: #333;
+  background: rgba(255, 255, 200, 0.85);
+  border: 1px solid #999;
+  border-radius: 4px;
+  padding: 2px 8px;
+  max-width: 280px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 200ms;
+  pointer-events: none;
+}
+
+.status.visible {
+  opacity: 1;
+}
+
+@keyframes pop-in {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

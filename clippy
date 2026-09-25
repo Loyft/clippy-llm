@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Convenience launcher for development.
+# Usage: ./clippy [--model NAME] [--ollama URL]
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT"
+
+# Prefer a workspace-local Rust toolchain if present
+if [[ -f "$ROOT/.cargo/env" ]]; then
+  # shellcheck disable=SC1091
+  source "$ROOT/.cargo/env"
+  export CARGO_HOME="${CARGO_HOME:-$ROOT/.cargo}"
+  export RUSTUP_HOME="${RUSTUP_HOME:-$ROOT/.rustup}"
+fi
+
+export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$ROOT/src-tauri/target}"
+
+if [[ ! -d node_modules ]]; then
+  npm install
+fi
+
+# Tauri expects: `tauri dev -- [runnerArgs] -- [appArgs]`
+# Without the second `--`, flags like --model are swallowed by `cargo run`.
+exec npm run tauri -- dev -- -- "$@"
