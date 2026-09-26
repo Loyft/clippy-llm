@@ -26,10 +26,14 @@
           id="clippy-canvas"
           width="124"
           height="93"
-          aria-label="Clippy — drag to move"
+          aria-label="Companion — drag to move"
           title="Drag to move · Click to chat"
           data-tauri-drag-region
         ></canvas>
+        <div id="companion-switcher" class="companion-switcher" role="group" aria-label="Companion">
+          <button type="button" data-companion="Clippy" class="companion-btn active" title="Clippy">Clippy</button>
+          <button type="button" data-companion="Cat" class="companion-btn" title="Cat">Cat</button>
+        </div>
         <div id="status" class="status"></div>
       </div>
     </div>
