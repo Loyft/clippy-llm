@@ -56,15 +56,47 @@ body {
 }
 
 .companion-switcher {
+  position: relative;
+  z-index: 5;
   display: flex;
-  gap: 4px;
+  justify-content: center;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
   -webkit-app-region: no-drag;
   app-region: no-drag;
 }
 
+.companion-switcher.open,
+.companion-switcher:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+  /* Bridge upward toward the character so the cursor can travel down */
+  padding-top: 16px;
+  margin-top: -8px;
+}
+
+.companion-menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+  gap: 4px;
+  width: min(320px, 100%);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 160ms ease;
+}
+
+.companion-switcher.open .companion-menu,
+.companion-switcher:focus-within .companion-menu {
+  max-height: 56px; /* ~2 rows of buttons */
+}
+
 .companion-btn {
   border: 1px solid #666;
-  background: rgba(255, 255, 220, 0.92);
+  background: rgba(255, 255, 220, 0.95);
   color: #222;
   border-radius: 6px;
   padding: 2px 10px;
@@ -72,6 +104,9 @@ body {
   font-size: 11px;
   cursor: pointer;
   line-height: 1.4;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  text-align: center;
 }
 
 .companion-btn:hover {
