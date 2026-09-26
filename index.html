@@ -1,42 +1,50 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clippy</title>
-  </head>
-  <body>
-    <div id="app">
-      <div id="stage">
-        <div id="bubble" class="bubble hidden" role="dialog" aria-live="polite">
-          <div id="bubble-text" class="bubble-text"></div>
-          <form id="chat-form" class="chat-form">
-            <input
-              id="chat-input"
-              type="text"
-              placeholder="Ask Clippy..."
-              autocomplete="off"
-              spellcheck="false"
-            />
-            <button type="submit" id="send-btn" title="Send">➤</button>
-          </form>
-          <button id="bubble-close" type="button" title="Close" aria-label="Close">×</button>
-        </div>
-        <canvas
-          id="clippy-canvas"
-          width="124"
-          height="93"
-          aria-label="Companion — drag to move"
-          title="Drag to move · Click to chat"
-          data-tauri-drag-region
-        ></canvas>
-        <div id="companion-switcher" class="companion-switcher" role="group" aria-label="Companion">
-          <button type="button" data-companion="Clippy" class="companion-btn active" title="Clippy">Clippy</button>
-          <button type="button" data-companion="Cat" class="companion-btn" title="Cat">Cat</button>
-        </div>
-        <div id="status" class="status"></div>
-      </div>
-    </div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+ <head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Clippy</title>
+ </head>
+ <body>
+ <div id="app">
+ <div id="stage">
+ <div id="bubble" class="bubble hidden" role="dialog" aria-live="polite">
+ <div id="bubble-text" class="bubble-text"></div>
+ <form id="chat-form" class="chat-form">
+ <input
+ id="chat-input"
+ type="text"
+ placeholder="Ask Clippy..."
+ autocomplete="off"
+ spellcheck="false"
+ />
+ <button type="submit" id="send-btn" title="Send">➤</button>
+ </form>
+ <button id="bubble-close" type="button" title="Close" aria-label="Close">×</button>
+ </div>
+ <canvas
+ id="clippy-canvas"
+ width="124"
+ height="93"
+ aria-label="Companion - drag to move"
+ title="Drag to move · Click to chat"
+ data-tauri-drag-region
+ ></canvas>
+ <div
+ id="companion-switcher"
+ class="companion-switcher"
+ aria-label="Companions"
+ >
+ <div
+ id="companion-menu"
+ class="companion-menu"
+ role="listbox"
+ aria-label="Choose companion"
+ ></div>
+ </div>
+ <div id="status" class="status"></div>
+ </div>
+ </div>
+ <script type="module" src="/src/main.ts"></script>
+ </body>
 </html>
