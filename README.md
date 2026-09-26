@@ -1,13 +1,13 @@
 # Clippy LLM
 
 <p align="center">
- <img src="media/demo.gif" alt="Clippy LLM demo - switch between Clippy and Cat companions" width="640" />
+  <img src="media/demo.gif" alt="Clippy LLM demo - switch between classic Office Assistants and Cat" width="640" />
 </p>
 
 <p align="center">
- <strong>A Mac-first desktop companion</strong> that chats with a local LLM via <a href="https://ollama.com">Ollama</a>.<br/>
- Always-on-top, transparent window · drag to move · tray controls · classic Office Assistants + Cat.<br/>
- <em>Free as in freedom</em> - local models, open stack, yours to run and tweak.
+  <strong>A Mac-first desktop companion</strong> that chats with a local LLM via <a href="https://ollama.com">Ollama</a>.<br/>
+  Always-on-top, transparent window · drag to move · tray controls · classic Office Assistants + Cat.<br/>
+  <em>Free as in freedom</em> - local models, open stack, yours to run and tweak.
 </p>
 
 <p align="center">
@@ -21,13 +21,19 @@
 
 ## What it looks like
 
-| Clippy | Cat |
-|:---:|:---:|
-| <img src="media/clippy-chat.png" alt="Clippy chatting with a speech bubble" width="360" /> | <img src="media/cat-chat.png" alt="Ragdoll cat chatting with a speech bubble" width="360" /> |
+| Clippy | Merlin | Cat |
+|:---:|:---:|:---:|
+| <img src="media/clippy-chat.png" alt="Clippy chatting with a speech bubble" width="280" /> | <img src="media/merlin-chat.png" alt="Merlin chatting with a speech bubble" width="280" /> | <img src="media/cat-chat.png" alt="Ragdoll cat chatting with a speech bubble" width="280" /> |
 
 <p align="center">
- <img src="media/companions.png" alt="Clippy and Cat companions side by side" width="720" />
+  <img src="media/companions.png" alt="All ten companions: Clippy, Merlin, Links, Rover, Genius, Genie, Peedy, Rocky, F1, and Cat" width="780" />
 </p>
+
+<p align="center">
+  <img src="media/selector.png" alt="Two-row companion picker under Clippy" width="640" />
+</p>
+
+
 
 ## Stack
 
