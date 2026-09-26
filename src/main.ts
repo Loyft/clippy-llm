@@ -2,7 +2,12 @@ import "./styles.css";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { ClippyCharacter } from "./clippy";
+import {
+  ClippyCharacter,
+  COMPANIONS,
+  CompanionId,
+  isCompanionId,
+} from "./clippy";
 import {
   AppConfig,
   ChatMessage,
@@ -18,6 +23,7 @@ const chatInput = document.querySelector<HTMLInputElement>("#chat-input")!;
 const sendBtn = document.querySelector<HTMLButtonElement>("#send-btn")!;
 const closeBtn = document.querySelector<HTMLButtonElement>("#bubble-close")!;
 const statusEl = document.querySelector<HTMLDivElement>("#status")!;
+const switcher = document.querySelector<HTMLDivElement>("#companion-switcher")!;
 
 const clippy = new ClippyCharacter(canvas);
 let config: AppConfig = {
@@ -25,25 +31,40 @@ let config: AppConfig = {
   ollama_url: "http://127.0.0.1:11434",
   system_prompt: "",
   proactive: true,
+  companion: "Clippy",
 };
+let companionId: CompanionId = "Clippy";
 let history: ChatMessage[] = [];
 let busy = false;
 let abortCtrl: AbortController | null = null;
 let proactiveTimer: number | null = null;
 
-const PROACTIVE_LINES = [
-  "It looks like you're working hard! Need a hand with anything?",
-  "Psst — I can help draft text, explain code, or just chat.",
-  "Did you know you can drag me around the screen?",
-  "Would you like some help organizing your thoughts?",
-  "I'm still here if you need me!",
-];
+const PROACTIVE_LINES: Record<CompanionId, string[]> = {
+  Clippy: [
+    "It looks like you're working hard! Need a hand with anything?",
+    "Psst — I can help draft text, explain code, or just chat.",
+    "Did you know you can drag me around the screen?",
+    "Would you like some help organizing your thoughts?",
+    "I'm still here if you need me!",
+  ],
+  Cat: [
+    "Mrrp — you've been busy. Want a paw with anything?",
+    "I can help draft text, explain code, or just loaf and chat.",
+    "Psst: you can drag me around the screen.",
+    "Need help untangling a thought? Ragdolls are good at yarn… and ideas.",
+    "Still here on the desk if you need me. Purr.",
+  ],
+};
 
 const DRAG_THRESHOLD_PX = 5;
 let pointerActive = false;
 let dragStarted = false;
 let pointerStartX = 0;
 let pointerStartY = 0;
+
+function companion() {
+  return COMPANIONS[companionId];
+}
 
 function showStatus(msg: string, ms = 3500) {
   statusEl.textContent = msg;
@@ -66,13 +87,55 @@ function setBusy(value: boolean) {
   chatInput.disabled = value;
 }
 
+function applyCompanionChrome() {
+  const def = companion();
+  chatInput.placeholder = def.placeholder;
+  canvas.style.width = `${def.displaySize.width}px`;
+  canvas.style.height = `${def.displaySize.height}px`;
+  canvas.setAttribute("aria-label", `${def.name} — drag to move`);
+
+  for (const btn of switcher.querySelectorAll<HTMLButtonElement>(".companion-btn")) {
+    btn.classList.toggle("active", btn.dataset.companion === companionId);
+  }
+}
+
+function resetHistoryForCompanion() {
+  const custom = config.system_prompt.trim();
+  const isBuiltIn =
+    !custom ||
+    custom === COMPANIONS.Clippy.systemPrompt ||
+    custom === COMPANIONS.Cat.systemPrompt;
+  history = [
+    {
+      role: "system",
+      content: isBuiltIn ? companion().systemPrompt : custom,
+    },
+  ];
+}
+
 async function loadConfig() {
   try {
     config = await invoke<AppConfig>("get_config");
   } catch (e) {
     console.warn("Could not load config from Tauri, using defaults", e);
   }
-  history = [{ role: "system", content: config.system_prompt }];
+
+  const stored = localStorage.getItem("companion");
+  if (config.companion && isCompanionId(config.companion)) {
+    companionId = config.companion;
+  } else if (stored && isCompanionId(stored)) {
+    companionId = stored;
+  }
+  resetHistoryForCompanion();
+}
+
+async function persistCompanion(id: CompanionId) {
+  localStorage.setItem("companion", id);
+  try {
+    config = await invoke<AppConfig>("set_companion", { companion: id });
+  } catch {
+    config = { ...config, companion: id };
+  }
 }
 
 async function ensureOllama() {
@@ -125,7 +188,6 @@ async function askClippy(prompt: string) {
     }
 
     history.push({ role: "assistant", content: reply });
-    // Keep history bounded
     if (history.length > 21) {
       history = [history[0], ...history.slice(-20)];
     }
@@ -134,7 +196,6 @@ async function askClippy(prompt: string) {
     const msg = e instanceof Error ? e.message : String(e);
     bubbleText.textContent = `Oh dear — something went wrong:\n${msg}`;
     clippy.play("GetAttention");
-    // Remove the failed user turn
     if (history[history.length - 1]?.role === "user") {
       history.pop();
     }
@@ -151,12 +212,11 @@ function scheduleProactive() {
   }
   if (!config.proactive) return;
 
-  // 3–6 minutes
   const delay = 180_000 + Math.random() * 180_000;
   proactiveTimer = window.setTimeout(() => {
     if (!busy && bubble.classList.contains("hidden")) {
-      const line =
-        PROACTIVE_LINES[Math.floor(Math.random() * PROACTIVE_LINES.length)];
+      const lines = PROACTIVE_LINES[companionId];
+      const line = lines[Math.floor(Math.random() * lines.length)];
       openBubble(line);
       clippy.play("GetAttention");
     }
@@ -166,7 +226,7 @@ function scheduleProactive() {
 
 function onClippyActivate() {
   if (bubble.classList.contains("hidden")) {
-    openBubble("Hi! What can I help you with today?");
+    openBubble(companion().activate);
     clippy.play("Wave");
     chatInput.focus();
   } else {
@@ -174,7 +234,6 @@ function onClippyActivate() {
   }
 }
 
-/** Drag Clippy to move the window; a tap (no move) opens chat. */
 function setupWindowDragging() {
   canvas.addEventListener("pointerdown", (e) => {
     if (e.button !== 0) return;
@@ -216,6 +275,33 @@ function setupWindowDragging() {
   canvas.addEventListener("pointercancel", endPointer);
 }
 
+async function switchCompanion(id: CompanionId) {
+  if (id === companionId) return;
+  if (busy) {
+    showStatus("Wait for the reply first");
+    return;
+  }
+
+  abortCtrl?.abort();
+  companionId = id;
+  applyCompanionChrome();
+  resetHistoryForCompanion();
+  await persistCompanion(id);
+  await clippy.load(companion().path, companion().idleAnims);
+  openBubble(companion().hello(config.model));
+  clippy.play("Wave");
+  showStatus(`Switched to ${companion().name}`);
+  chatInput.focus();
+}
+
+switcher.addEventListener("click", (e) => {
+  const btn = (e.target as HTMLElement).closest<HTMLButtonElement>(
+    ".companion-btn",
+  );
+  if (!btn?.dataset.companion || !isCompanionId(btn.dataset.companion)) return;
+  void switchCompanion(btn.dataset.companion);
+});
+
 chatForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const value = chatInput.value;
@@ -231,8 +317,9 @@ closeBtn.addEventListener("click", () => {
 setupWindowDragging();
 
 async function boot() {
-  await clippy.load("/agents/Clippy");
   await loadConfig();
+  applyCompanionChrome();
+  await clippy.load(companion().path, companion().idleAnims);
 
   try {
     await listen<boolean>("proactive-changed", (event) => {
@@ -246,9 +333,7 @@ async function boot() {
 
   const online = await ensureOllama();
   if (online) {
-    openBubble(
-      `Hi! I'm Clippy.\n\nAsk me anything — I'm using ${config.model} via Ollama.\n\nDrag me to move around!`,
-    );
+    openBubble(companion().hello(config.model));
     clippy.play("Wave");
   }
 

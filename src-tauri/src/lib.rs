@@ -89,6 +89,19 @@ fn set_proactive(state: State<'_, ConfigState>, enabled: bool) -> AppConfig {
 }
 
 #[tauri::command]
+fn set_companion(state: State<'_, ConfigState>, companion: String) -> Result<AppConfig, String> {
+    let normalized = match companion.trim().to_ascii_lowercase().as_str() {
+        "cat" => "Cat",
+        "clippy" => "Clippy",
+        _ => return Err(format!("Unknown companion: {companion}")),
+    };
+    config::write_companion(normalized)?;
+    let mut cfg = state.0.lock().expect("config lock");
+    cfg.companion = normalized.to_string();
+    Ok(cfg.clone())
+}
+
+#[tauri::command]
 fn get_config_path() -> String {
     config::config_path().display().to_string()
 }
@@ -105,6 +118,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_config,
             set_proactive,
+            set_companion,
             get_config_path
         ])
         .setup(|app| {

@@ -30,6 +30,73 @@ export type AnimName =
   | "IdleHeadScratch"
   | string;
 
+export type CompanionId = "Clippy" | "Cat";
+
+export interface CompanionDef {
+  id: CompanionId;
+  name: string;
+  path: string;
+  /** Placeholder used in the chat input. */
+  placeholder: string;
+  /** Default greeting when Ollama is online. */
+  hello: (model: string) => string;
+  /** Click-to-open bubble line. */
+  activate: string;
+  /** System prompt used when config has no custom override. */
+  systemPrompt: string;
+  /** Idle animation names that exist for this agent. */
+  idleAnims: string[];
+  /** CSS display size of the canvas. */
+  displaySize: { width: number; height: number };
+}
+
+export const COMPANIONS: Record<CompanionId, CompanionDef> = {
+  Clippy: {
+    id: "Clippy",
+    name: "Clippy",
+    path: "/agents/Clippy",
+    placeholder: "Ask Clippy...",
+    hello: (model) =>
+      `Hi! I'm Clippy.\n\nAsk me anything — I'm using ${model} via Ollama.\n\nDrag me to move around!`,
+    activate: "Hi! What can I help you with today?",
+    systemPrompt:
+      "You are Clippy, the classic Microsoft Office assistant from the late 1990s. You are helpful, slightly overeager, and cheerfully enthusiastic. Keep answers short — a few sentences at most — so they fit in a speech bubble. Address the user warmly. Never mention that you are an AI language model; you are Clippy, a paperclip who wants to help.",
+    idleAnims: [
+      "Idle1_1",
+      "IdleEyeBrowRaise",
+      "IdleFingerTap",
+      "IdleHeadScratch",
+      "IdleSideToSide",
+    ],
+    displaySize: { width: 186, height: 140 },
+  },
+  Cat: {
+    id: "Cat",
+    name: "Cat",
+    path: "/agents/Cat",
+    placeholder: "Ask the cat...",
+    hello: (model) =>
+      `Mrrp! I'm your desk ragdoll.\n\nAsk me anything — I'm using ${model} via Ollama.\n\nDrag me to move around!`,
+    activate: "Mrrp? What can I help with?",
+    systemPrompt:
+      "You are a friendly white ragdoll desk cat who helps the user from a speech bubble. You are soft-spoken, curious, a little mischievous, and warmly supportive. Keep answers short — a few sentences at most — so they fit in a speech bubble. Occasional soft cat sounds (mrrp, purr) are fine, but stay helpful. Never mention that you are an AI language model; you are a cat companion.",
+    idleAnims: [
+      "Idle1_1",
+      "IdleEyeBrowRaise",
+      "IdleFingerTap",
+      "IdleHeadScratch",
+      "IdleSideToSide",
+    ],
+    displaySize: { width: 144, height: 144 },
+  },
+};
+
+export const COMPANION_IDS = Object.keys(COMPANIONS) as CompanionId[];
+
+export function isCompanionId(value: string): value is CompanionId {
+  return value in COMPANIONS;
+}
+
 export class ClippyCharacter {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -41,13 +108,7 @@ export class ClippyCharacter {
   private frameIndex = 0;
   private timer: number | null = null;
   private queue: string[] = [];
-  private idleAnims = [
-    "Idle1_1",
-    "IdleEyeBrowRaise",
-    "IdleFingerTap",
-    "IdleHeadScratch",
-    "IdleSideToSide",
-  ];
+  private idleAnims = COMPANIONS.Clippy.idleAnims;
   private onIdle: (() => void) | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -58,7 +119,13 @@ export class ClippyCharacter {
     this.img = new Image();
   }
 
-  async load(basePath = "/agents/Clippy"): Promise<void> {
+  async load(
+    basePath = "/agents/Clippy",
+    idleAnims?: string[],
+  ): Promise<void> {
+    this.clearTimer();
+    this.queue = [];
+
     const res = await fetch(`${basePath}/agent.json`);
     this.data = (await res.json()) as AgentData;
     this.frameW = this.data.framesize[0];
@@ -66,10 +133,26 @@ export class ClippyCharacter {
     this.canvas.width = this.frameW;
     this.canvas.height = this.frameH;
 
+    if (idleAnims?.length) {
+      this.idleAnims = idleAnims.filter((name) => this.data?.animations[name]);
+    } else {
+      this.idleAnims = COMPANIONS.Clippy.idleAnims.filter(
+        (name) => this.data?.animations[name],
+      );
+    }
+    if (this.idleAnims.length === 0) {
+      this.idleAnims = Object.keys(this.data.animations).filter((n) =>
+        n.startsWith("Idle"),
+      );
+      if (this.idleAnims.length === 0) this.idleAnims = ["RestPose"];
+    }
+
     await new Promise<void>((resolve, reject) => {
       this.img.onload = () => resolve();
-      this.img.onerror = () => reject(new Error("Failed to load Clippy sprite map"));
-      this.img.src = `${basePath}/map.png`;
+      this.img.onerror = () =>
+        reject(new Error(`Failed to load sprite map at ${basePath}/map.png`));
+      // Bust cache when switching companions that share filenames
+      this.img.src = `${basePath}/map.png?t=${Date.now()}`;
     });
 
     this.play("Greeting");
@@ -136,9 +219,9 @@ export class ClippyCharacter {
       this.play(next);
       return;
     }
-    // Return to idle loop
     const idle =
-      this.idleAnims[Math.floor(Math.random() * this.idleAnims.length)] ?? "Idle1_1";
+      this.idleAnims[Math.floor(Math.random() * this.idleAnims.length)] ??
+      "Idle1_1";
     this.play(idle);
     this.onIdle?.();
   }

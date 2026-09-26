@@ -3,6 +3,7 @@ export interface AppConfig {
   ollama_url: string;
   system_prompt: string;
   proactive: boolean;
+  companion: string;
 }
 
 export interface ChatMessage {

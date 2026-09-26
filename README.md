@@ -5,7 +5,7 @@ A Mac-first desktop companion that looks and acts like classic Clippy, powered b
 ## Stack
 
 - **Tauri 2** — lightweight native shell, transparent always-on-top window, menu-bar tray
-- **TypeScript + Vite** — speech bubble UI + Clippy sprite animations
+- **TypeScript + Vite** — speech bubble UI + companion sprite animations
 - **Ollama** — local chat API (`http://127.0.0.1:11434`)
 
 ## Prerequisites
@@ -59,6 +59,7 @@ On first launch, Clippy writes `~/.config/clippy-llm/config.toml`:
 model = "llama3.2"
 ollama_url = "http://127.0.0.1:11434"
 proactive = true
+companion = "Clippy"   # or "Cat"
 # system_prompt = "..."
 ```
 
@@ -66,20 +67,31 @@ CLI flags override the config file.
 
 ## Usage
 
-- Click Clippy to open the speech bubble and chat
-- Drag Clippy by the character to reposition the window
+- Click the companion to open the speech bubble and chat
+- Drag the character to reposition the window
+- Use the **Clippy / Cat** buttons under the character to switch companions
 - Menu-bar tray: Hide/Show, Mute proactive tips, Quit
 - Closing the window hides Clippy; quit from the tray
+
+## Companions
+
+| Companion | Assets | Notes |
+|-----------|--------|--------|
+| **Clippy** | `public/agents/Clippy` | Classic Office Assistant sprites (clippy.js) |
+| **Cat** | `public/agents/Cat` | Original white ragdoll pixel sprites generated for this project |
 
 ## Project layout
 
 ```
-src/                 # frontend (sprite stage, bubble, Ollama client)
-src-tauri/           # Rust shell (window, tray, CLI, config)
-public/agents/Clippy # classic Clippy sprite sheet + animation map
-scripts/clippy.js    # npm bin helper
+src/                    # frontend (sprite stage, bubble, Ollama client)
+src-tauri/              # Rust shell (window, tray, CLI, config)
+public/agents/Clippy    # classic Clippy sprite sheet + animation map
+public/agents/Cat       # original cat sprite sheet + animation map
+scripts/clippy.js       # npm bin helper
 ```
 
 ## License note
 
 Clippy sprite assets originate from the classic Office Assistant recreation used by [clippy.js](https://github.com/smore-inc/clippy.js). Microsoft trademarks belong to their respective owners; this project is an unofficial fan companion for personal use.
+
+The Cat companion (white ragdoll, pixel art) is original artwork generated for this project and may be used freely with the app.
