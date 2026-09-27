@@ -1,0 +1,46 @@
+name: Companion
+description: Propose or track a new companion character
+title: "[companion] "
+labels: ["companion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing a companion. Follow the steps in [CONTRIBUTING.md](https://github.com/Loyft/clippy-llm/blob/main/CONTRIBUTING.md#adding-a-companion).
+  - type: input
+    id: name
+    attributes:
+      label: Companion name
+      description: Display / folder name (e.g. Merlin)
+      placeholder: Name
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Personality, look, and how it should greet the user
+    validations:
+      required: true
+  - type: dropdown
+    id: assets
+    attributes:
+      label: Asset status
+      options:
+        - I will contribute original / clearly licensed assets
+        - Assets already exist; I need help wiring them up
+        - Idea only (no assets yet)
+    validations:
+      required: true
+  - type: textarea
+    id: rights
+    attributes:
+      label: Rights / attribution
+      description: Confirm you can contribute the art, and note any required attribution
+    validations:
+      required: true
+  - type: textarea
+    id: extras
+    attributes:
+      label: Anything else?
+      description: Links to mockups, sprite sources, etc.

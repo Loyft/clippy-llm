@@ -1,0 +1,41 @@
+name: QoL or bug
+description: Quality-of-life improvement or bug report
+title: "[qol] "
+labels: ["qol"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep changes small. Large features and architecture work are [out of scope](https://github.com/Loyft/clippy-llm/blob/main/CONTRIBUTING.md#out-of-scope).
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Quality of life
+        - Bug
+        - Docs
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What should change, or what goes wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce (bugs)
+      description: macOS version, model, and steps if this is a bug
+      placeholder: |
+        1.
+        2.
+        3.
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed approach (optional)
+      description: Keep it scoped — companions and small QoL only

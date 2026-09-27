@@ -2,7 +2,8 @@
 name = "clippy"
 version = "0.1.0"
 description = "Clippy desktop companion powered by a local LLM"
-authors = ["you"]
+authors = ["Loyft"]
+license = "MIT"
 edition = "2021"
 
 [lib]
