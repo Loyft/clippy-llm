@@ -11,6 +11,8 @@
 </p>
 
 <p align="center">
+ <img alt="License" src="https://img.shields.io/badge/license-MIT-green?style=flat-square" />
+ <img alt="PRs" src="https://img.shields.io/badge/PRs-welcome%20(scoped)-0E8A16?style=flat-square" />
  <img alt="Platform" src="https://img.shields.io/badge/platform-macOS-black?style=flat-square" />
  <img alt="Tauri" src="https://img.shields.io/badge/Tauri-2-FFC131?style=flat-square&logo=tauri&logoColor=white" />
  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" />
@@ -135,7 +137,13 @@ media/ # README promo images + demo GIF
 scripts/clippy.js # npm bin helper
 ```
 
-## License note
+## Contributing
+
+Scoped contributions only (new companions, QoL, bugs, docs). See [CONTRIBUTING.md](CONTRIBUTING.md). All merges require maintainer approval.
+
+## License
+
+Project **code** is licensed under the [MIT License](LICENSE).
 
 Classic Office Assistant sprite assets (Clippy, Merlin, Links, Rover, Genius, Genie, Peedy, Rocky, F1) originate from the recreation used by [clippy.js](https://github.com/smore-inc/clippy.js). Microsoft trademarks belong to their respective owners; this project is an unofficial fan companion for personal use.
 
